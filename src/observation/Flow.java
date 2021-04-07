@@ -19,12 +19,12 @@ public class Flow extends AbstractObservation {
 
     @Override
     public double calcValue() {
-        int speedSum = 0;
-        List<Integer> speedList = sys.getSpeeds();
-        for (int s : speedList) {
-            speedSum += s;
-        }
-        return (double) speedSum / (sys.getNumCell());
+        //全車両の速度の和を求める
+        
+        
+        //速度の和をセルの総数で除したものを返す
+
+        return 0.;
     }
 
     public static void main(String args[]) throws IOException {
