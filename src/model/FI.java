@@ -1,8 +1,10 @@
 package model;
 
 import java.io.PrintStream;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Random;
 import myLib.utils.Utils;
 
 /**
@@ -16,8 +18,10 @@ public class FI {
     private final int maxSpeed;//最高速度
     private int numCar;//車両数
     private List<Car> carList;
+    private final Random random;
 
-    public FI(int numCell, int maxSpeed, int numCar) {
+    public FI(int numCell, int maxSpeed, int numCar, Random random) {
+        this.random = random;
         if (numCell < numCar) {
             throw new IllegalArgumentException();
         }
@@ -33,12 +37,35 @@ public class FI {
     private void initialize() {
         carList = Utils.createList();
         //0からL-1の中から、numCar個の整数をランダムに選択
-        int[] positions = Utils.createRandomNumberList(numCell, numCar);
+        int[] positions = createRandomPosition(numCell, numCar);
         Arrays.sort(positions);//昇順に整列
         for (int i = 0; i < numCar; i++) {
             int x = positions[numCar - 1 - i];
             carList.add(new Car(x, maxSpeed));
         }
+    }
+
+    /**
+     * generate n random numbers in [0,nCell) Each random numbers appears once.
+     *
+     * @param nCell
+     * @param n
+     * @return
+     */
+    private int[] createRandomPosition(int nCell, int n) {
+        List<Integer> list = new ArrayList<>();
+        for (int i = 0; i < nCell; i++) {
+            list.add(i);
+        }
+        int count = 0;
+        int c[] = new int[n];
+        while (count < n) {
+            int k = random.nextInt(list.size());
+            int x = list.remove(k);
+            c[count] = x;
+            count++;
+        }
+        return c;
     }
 
     /**
@@ -54,7 +81,7 @@ public class FI {
             carList.get(i).evalSpeed(gap);
         }
         //全車両を移動
-        carList.stream().forEach(car -> car.move(numCell));
+        carList.forEach(car -> car.move(numCell));
     }
 
     /**
@@ -64,9 +91,7 @@ public class FI {
      */
     public List<Integer> getPositions() {
         List<Integer> list = Utils.createList();
-        carList.stream().forEachOrdered((car) -> {
-            list.add(car.getPosition());
-        });
+        carList.stream().forEachOrdered(car -> list.add(car.getPosition()));
         return list;
     }
 
@@ -77,20 +102,19 @@ public class FI {
      */
     public List<Integer> getSpeeds() {
         List<Integer> list = Utils.createList();
-        carList.stream().forEachOrdered((car) -> {
-            list.add(car.getSpeed());
-        });
+        carList.stream().forEachOrdered(car -> list.add(car.getSpeed()));
         return list;
     }
 
     /**
      * 系の状態を印刷
-     * @param out 
+     *
+     * @param out
      */
     public void printState(PrintStream out) {
         List<Integer> positions = getPositions();
         int p[] = new int[numCell];
-        positions.stream().forEach((i) -> {
+        positions.forEach(i -> {
             p[i] = 1;
         });
         for (int i = 0; i < p.length; i++) {
@@ -114,31 +138,33 @@ public class FI {
     public int getNumCell() {
         return numCell;
     }
-    
+
     /**
      * 指定した場所から後方（座標の小さい方向）に停止した車両を配置
-     * @param x0 
+     *
+     * @param x0
      */
-    public void  forceInitial(int x0){
+    public void forceInitial(int x0) {
         carList = Utils.createList();
         for (int i = 0; i < numCar; i++) {
-            int x = x0-i;
+            int x = x0 - i;
             carList.add(new Car(x, maxSpeed));
         }
     }
-      /**
+
+    /**
      * @param args the command line arguments
      */
     public static void main(String[] args) {
         int tMax = 10;
         int numCells = 15;
         int n = 6;
-        int vmax=2;
-        FI sys = new FI(numCells,vmax,n);
-        for(int t=0;t<tMax;t++){
+        int vmax = 2;
+        FI sys = new FI(numCells, vmax, n, new Random(48L));
+        for (int t = 0; t < tMax; t++) {
             sys.printState(System.out);
             sys.update();
         }
-    }  
-    
+    }
+
 }
