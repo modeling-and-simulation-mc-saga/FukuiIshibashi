@@ -1,7 +1,7 @@
 package model;
 
 /**
- * Fukui-Ishibashiモデル中の車両クラス
+ * Car class for Fukui-Ishibashi model
  *
  * @author tadaki
  */
@@ -18,16 +18,14 @@ public class Car {
     }
 
     public Car(int position, int maxSpeed) {
-        this.position = position;
-        this.speed = 0;
-        this.maxSpeed = maxSpeed;
+        this(position,0,maxSpeed);
     }
 
     /**
-     * 速度の決定
+     * Decide speed from the front gap
      *
-     * @param gap 先行車両との間の空きセル数
-     * @return 決定した速度
+     * @param gap empty cells to the preceding car
+     * @return speed
      */
     public int evalSpeed(int gap) {
         speed = Math.min(gap, maxSpeed);
@@ -35,9 +33,9 @@ public class Car {
     }
 
     /**
-     * 移動
+     * Move
      *
-     * @param length システムのセル数
+     * @param length the length of the system
      * @return
      */
     public int move(int length) {
@@ -45,6 +43,8 @@ public class Car {
         return position;
     }
 
+    //*** getters 
+    
     public int getPosition() {
         return position;
     }

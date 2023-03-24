@@ -1,11 +1,10 @@
 package observation;
 
 import java.awt.geom.Point2D;
-import java.io.BufferedWriter;
 import java.io.IOException;
+import java.io.PrintStream;
 import java.util.List;
 import java.util.Random;
-import myLib.utils.FileIO;
 
 /**
  *
@@ -17,14 +16,17 @@ public class Flow extends AbstractObservation {
         super(numCells, maxSpeed, random);
     }
 
+    /**
+     * Calculate average flow
+     */
     @Override
     public double calcValue() {
-        //全車両の速度の和を求める
-        
-        
-        //速度の和をセルの総数で除したものを返す
-
-        return 0.;
+        int speedSum = 0;
+        List<Integer> speedList = sys.getSpeeds();
+        for (int s : speedList) {
+            speedSum += s;
+        }
+        return (double) speedSum / (sys.getNumCell());
     }
 
     public static void main(String args[]) throws IOException {
@@ -32,10 +34,8 @@ public class Flow extends AbstractObservation {
         int maxSpeed = 3;
         Flow flow = new Flow(numCells, maxSpeed, new Random(48L));
         List<Point2D.Double> pList = flow.calcValues(20, numCells);
-        try (BufferedWriter out = FileIO.openWriter("Flow-output.txt")) {
-            for (Point2D.Double p : pList) {
-                FileIO.writeSSV(out, p.x, p.y);
-            }
+        try (PrintStream out = new PrintStream("Flow-output.txt")) {
+            pList.forEach(p->out.println(p.x+" "+p.y));
         }
     }
 }

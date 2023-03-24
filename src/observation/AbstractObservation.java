@@ -1,13 +1,16 @@
 package observation;
 
 import java.awt.geom.Point2D;
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Random;
 import model.FI;
-import myLib.utils.Utils;
 
 /**
- * 観測を行う抽象クラス 密度を変えながらシミュレーションを行い、その結果を得る
+ * Abstract class for observation
+ * 
+ * Observe by changing density
  *
  * @author tadaki
  */
@@ -20,27 +23,26 @@ public abstract class AbstractObservation {
     }
 
     /**
-     * 平均量の取得
+     * Get average value
      *
-     * @param tmax 観測時間
      * @return
      */
     abstract public double calcValue();
 
     /**
-     * 平均量の取得
+     * Get list of average values
      *
-     * @param dn 車両数の変化
-     * @param tRelax 緩和時間
+     * @param dn step for changing the number of cars
+     * @param tRelax relaxing time
      * @return
      */
     public List<Point2D.Double> calcValues(int dn, int tRelax) {
-        List<Point2D.Double> pList = Utils.createList();
+        List<Point2D.Double> pList = Collections.synchronizedList(new ArrayList<>());
         int numCells = sys.getNumCell();
         int numCar = dn;
-        while (numCar < numCells) {//各車両数に対して
-            initializeAndRelax(numCar, tRelax);//初期状態からの緩和
-            double value = calcValue();//観測量を取得
+        while (numCar < numCells) {
+            initializeAndRelax(numCar, tRelax);//relaxing
+            double value = calcValue();//get average value
             pList.add(new Point2D.Double((double) numCar / numCells, value));
             numCar += dn;
         }
@@ -48,10 +50,10 @@ public abstract class AbstractObservation {
     }
 
     /**
-     * 初期化して緩和
+     * initialize and relax
      *
-     * @param numCar 車両数
-     * @param tRelax 緩和させる時間
+     * @param numCar the number of cars
+     * @param tRelax relaxing time
      */
     protected void initializeAndRelax(int numCar, int tRelax) {
         sys.setNumCar(numCar);
