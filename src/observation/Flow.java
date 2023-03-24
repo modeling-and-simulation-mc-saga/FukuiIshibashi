@@ -22,10 +22,10 @@ public class Flow extends AbstractObservation {
     @Override
     public double calcValue() {
         int speedSum = 0;
-        List<Integer> speedList = sys.getSpeeds();
-        for (int s : speedList) {
-            speedSum += s;
-        }
+
+        
+        
+    
         return (double) speedSum / (sys.getNumCell());
     }
 
